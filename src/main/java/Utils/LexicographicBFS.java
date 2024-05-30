@@ -14,67 +14,85 @@ public class LexicographicBFS {
     }
 
     // Return the ordered vertex list using LexBFS Algorithm
-    // The list returned is in descending order, meaning the first element visited will have the highest value, and the last will have the lowest value
+    // The list returned is in descending order, meaning the last element is the start, and the first element is the finish.
     public int[] getOrderedVertexList() {
-        List<List<Integer>> listOfCells = new LinkedList<>();
-        int[] orderedVertices = new int[graph.numVertices()];
-
-        int i = graph.numVertices();
-
-        // Get an arbitrary order of the vertices
-        List<Integer> firstList = new LinkedList<>();
-        for (var vertex : graph.vertices()) {
-            firstList.add(vertex);
+        List<Integer> vertices = new LinkedList<>();
+        // Keep track of vertices that need to be visited by storing lists of vertices
+        List<List<Integer>> listOfVertices = new LinkedList<>();
+        for(var vertex : graph.vertices())
+        {
+            vertices.add(vertex);
         }
-        listOfCells.add(firstList);
+        // Add the vertices in the list
+        listOfVertices.add(vertices);
 
-        // BFS
-        // To achieve lexicographical search, get the first list from the listOfCells, then get the first element from first list, then remove the element
-        // Removal is done in O(1) because of linked lists
-        while (!listOfCells.isEmpty()) {
-            // Get the front list
-            List<Integer> frontList = listOfCells.get(0);
-            // Get the front element
-            int currentVertex = frontList.get(0);
-            frontList.remove(0);
-            if (frontList.isEmpty()) {
-                listOfCells.remove(0);
-            }
+        int[] lexicographicalOrderVertices = new int[graph.numVertices()];
+        int counter = graph.numVertices() - 1;
 
-            // Vertices start from label 1
-            orderedVertices[currentVertex - 1] = i--;
+        while (!listOfVertices.isEmpty())
+        {
+            // Get the first list
+            List<Integer> firstList = listOfVertices.get(0);
 
-            List<List<Integer>> newCells = new LinkedList<>();
-            // Iterate through each cell of the list
-            for (List<Integer> currentCell : listOfCells) {
-                // Keep track of the neighbours of the current node
-                List<Integer> neighborsOfCurrentNode = new LinkedList<>();
+            // Get the first vertex from the list, and then remove it
+            Integer vertex = firstList.get(0);
+            firstList.remove(vertex);
+            if(firstList.isEmpty())
+                listOfVertices.remove(0);
 
-                for (Iterator<Integer> it = currentCell.iterator(); it.hasNext();) {
-                    int cellVertex = it.next();
-                    // Check if the vertex from the current cell has an edge with current vertex
-                    if (graph.containsEdge(currentVertex, cellVertex)) {
-                        // Add it to the list, and then remove it from the list
-                        neighborsOfCurrentNode.add(cellVertex);
-                        it.remove();
+            // Add the vertex in the order list
+            lexicographicalOrderVertices[counter--] = vertex;
+
+            // A list that stores the neighbours of a vertex
+            List<Integer> neighboursList = new LinkedList<>();
+            // A temporary stack used for listOfVertices
+            Stack<List<Integer>> stackListOfVertices = new Stack<>();
+
+            while (!listOfVertices.isEmpty())
+            {
+                // Get the front list and then remove it
+                List<Integer> frontList = listOfVertices.get(0);
+                listOfVertices.remove(0);
+                // A temp stack that will store vertexes that are not neighbours to the current vertex
+                Stack<Integer> tempStack = new Stack<>();
+                while (!frontList.isEmpty())
+                {
+                    // Get the first vertex and then remove it
+                    int frontVertex = frontList.get(0);
+                    frontList.remove(0);
+
+                    if(graph.containsEdge(vertex, frontVertex))
+                    {
+                        // If it contains an edge, add it to the list
+                        neighboursList.add(frontVertex);
+                    }
+                    else
+                    {
+                        // Add it to the stack if it doesn't have an edge
+                        tempStack.add(frontVertex);
                     }
                 }
-                // Add the neighbors of the cells to the newCells container if it is not empty.
-                if (!neighborsOfCurrentNode.isEmpty()) {
-                    newCells.add(neighborsOfCurrentNode);
+                while (!tempStack.isEmpty())
+                {
+                    // Add the vertices that are not neighbour with the current vertex to the front list
+                    frontList.add(tempStack.pop());
                 }
-                // Remove the cell if it is empty
-                if(currentCell.isEmpty())
-                    listOfCells.remove(currentCell);
+                if(!frontList.isEmpty())
+                {
+                    stackListOfVertices.add(frontList);
+                }
             }
-
-            // Iterate through each new cell and add it to the front of our list of cells if it is not empty.
-            for (List<Integer> cell : newCells) {
-                if(cell.isEmpty())
-                    continue;
-                listOfCells.add(0, cell); // Add cell to the front of listOfCells
+            if(!neighboursList.isEmpty())
+            {
+                // Add the neighbours to the list
+                listOfVertices.add(neighboursList);
+            }
+            while (!stackListOfVertices.isEmpty())
+            {
+                // Add the vertices in a new list, that are not neighbour to the vertex
+                listOfVertices.add(stackListOfVertices.pop());
             }
         }
-        return orderedVertices;
+        return lexicographicalOrderVertices;
     }
 }
