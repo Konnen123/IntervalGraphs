@@ -35,8 +35,7 @@ public class LexicographicBFS {
             List<Integer> firstList = listOfVertices.get(0);
 
             // Get the first vertex from the list, and then remove it
-            Integer vertex = firstList.get(0);
-            firstList.remove(vertex);
+            Integer vertex = firstList.remove(0);
             if(firstList.isEmpty())
                 listOfVertices.remove(0);
 
@@ -45,21 +44,19 @@ public class LexicographicBFS {
 
             // A list that stores the neighbours of a vertex
             List<Integer> neighboursList = new LinkedList<>();
-            // A temporary stack used for listOfVertices
-            Stack<List<Integer>> stackListOfVertices = new Stack<>();
+            // A temporary queue used for listOfVertices
+            Queue<List<Integer>> queueListOfVertices = new LinkedList<>();
 
             while (!listOfVertices.isEmpty())
             {
                 // Get the front list and then remove it
-                List<Integer> frontList = listOfVertices.get(0);
-                listOfVertices.remove(0);
+                List<Integer> frontList = listOfVertices.remove(0);
                 // A temp stack that will store vertexes that are not neighbours to the current vertex
                 Stack<Integer> tempStack = new Stack<>();
                 while (!frontList.isEmpty())
                 {
                     // Get the first vertex and then remove it
-                    int frontVertex = frontList.get(0);
-                    frontList.remove(0);
+                    int frontVertex = frontList.remove(0);
 
                     if(graph.containsEdge(vertex, frontVertex))
                     {
@@ -79,7 +76,7 @@ public class LexicographicBFS {
                 }
                 if(!frontList.isEmpty())
                 {
-                    stackListOfVertices.add(frontList);
+                    queueListOfVertices.add(frontList);
                 }
             }
             if(!neighboursList.isEmpty())
@@ -87,10 +84,11 @@ public class LexicographicBFS {
                 // Add the neighbours to the list
                 listOfVertices.add(neighboursList);
             }
-            while (!stackListOfVertices.isEmpty())
+
+            while (!queueListOfVertices.isEmpty())
             {
                 // Add the vertices in a new list, that are not neighbour to the vertex
-                listOfVertices.add(stackListOfVertices.pop());
+                listOfVertices.add(queueListOfVertices.remove());
             }
         }
         return lexicographicalOrderVertices;

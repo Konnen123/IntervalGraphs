@@ -8,31 +8,34 @@ public class ChordalityTest {
 
     private Graph graph;
 
-    public ChordalityTest(Graph graph)
+    private int[] orderedVertexList;
+
+    // For each vertex, store its neighbours that appear on the right side of the LexBFS list.
+    private List<List<Integer>> rightNeighbours;
+    // Parent of the current vertex is the first right neighbour element
+    // Parent object is a map, key - vertex, value - parent
+    private Map<Integer, Integer> parent;
+    // For each vertex, store the list of right neighbours without its parent.
+    private List<List<Integer>> rightNeighboursWithoutParent;
+    private List<List<Integer>> children;
+
+    public ChordalityTest(Graph graph, int[] orderedVertexList)
     {
         this.graph = graph;
-    }
-    public boolean checkChordality() {
 
         LexicographicBFS lexicographicBFS = new LexicographicBFS(graph);
-        int[] orderedVertexList = lexicographicBFS.getOrderedVertexList();
+        this.orderedVertexList = orderedVertexList;
 
-        // For each vertex, store its neighbours that appear on the right side of the LexBFS list.
-        List<List<Integer>> rightNeighbours = new ArrayList<>(graph.numVertices());
-        // Parent of the current vertex is the first right neighbour element
-        // Parent object is a map, key - vertex, value - parent
-        Map<Integer, Integer> parent = new HashMap<>();
-        // For each vertex, store the list of right neighbours without its parent.
-        List<List<Integer>> rightNeighboursWithoutParent = new ArrayList<>(graph.numVertices());
-        List<List<Integer>> children = new ArrayList<>();
+        rightNeighbours = new ArrayList<>(graph.numVertices());
+        parent = new HashMap<>();
+        rightNeighboursWithoutParent = new ArrayList<>(graph.numVertices());
+        children = new ArrayList<>();
 
-        initialize(orderedVertexList, rightNeighbours, parent, rightNeighboursWithoutParent, children);
+        initializeContainers();
+    }
 
-        for(var p : parent.entrySet())
-        {
-            System.out.println(p.getKey() + ": " + p.getValue());
-        }
-        // Chordality test
+    public boolean checkChordality() {
+        // Iterate through each element from the ordered list, except the last one
         for(int i=0;i<orderedVertexList.length - 1;i++)
         {
            // Get the vertex and the parent
@@ -41,31 +44,30 @@ public class ChordalityTest {
 
            for(int j = 0; j < rightNeighboursWithoutParent.get(vertex).size(); j++)
            {
-               boolean existsElement = false;
+
                // Now check if rightNeighbourNoParent list is a sublist of rightNeighbour
-               for(var rightNeighbourElement : rightNeighbours.get(currentParent))
+               for(var rightNeighbourNoParentElement : rightNeighboursWithoutParent.get(vertex))
                {
-                    for(var rightNeighbourNoParentElement : rightNeighboursWithoutParent.get(vertex))
+                    boolean existsElement = false;
+                    for(var rightNeighbourElement : rightNeighbours.get(currentParent))
                     {
                         if(Objects.equals(rightNeighbourElement, rightNeighbourNoParentElement))
                         {
                             existsElement = true;
                             break;
                         }
-
                     }
-                   if(existsElement)
-                       break;
+                   // If the element cannot be found, it means it is not a sublist, return false
+                    if(!existsElement)
+                        return false;
+
                }
-               // If it isn't a sublist, it means the graph isn't chordal, return false
-               if(!existsElement)
-                   return false;
            }
         }
 
         return true;
      }
-    private void initialize(int[] orderedVertexList, List<List<Integer>> rightNeighbours, Map<Integer, Integer> parent, List<List<Integer>> rightNeighboursWithoutParent, List<List<Integer>> children)
+    private void initializeContainers()
     {
         for(int i=0;i<orderedVertexList.length;i++)
         {
@@ -98,4 +100,19 @@ public class ChordalityTest {
         }
     }
 
+    public List<List<Integer>> getRightNeighbours() {
+        return rightNeighbours;
+    }
+
+    public Map<Integer, Integer> getParent() {
+        return parent;
+    }
+
+    public List<List<Integer>> getRightNeighboursWithoutParent() {
+        return rightNeighboursWithoutParent;
+    }
+
+    public List<List<Integer>> getChildren() {
+        return children;
+    }
 }
