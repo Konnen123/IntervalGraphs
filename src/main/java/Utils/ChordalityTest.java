@@ -11,13 +11,13 @@ public class ChordalityTest {
     private int[] orderedVertexList;
 
     // For each vertex, store its neighbours that appear on the right side of the LexBFS list.
-    private List<List<Integer>> rightNeighbours;
+    private Map<Integer, Set<Integer>> rightNeighbours;
     // Parent of the current vertex is the first right neighbour element
     // Parent object is a map, key - vertex, value - parent
     private Map<Integer, Integer> parent;
     // For each vertex, store the list of right neighbours without its parent.
-    private List<List<Integer>> rightNeighboursWithoutParent;
-    private List<List<Integer>> children;
+    private Map<Integer, Set<Integer>> rightNeighboursWithoutParent;
+    private Map<Integer, Set<Integer>> children;
 
     public ChordalityTest(Graph graph, int[] orderedVertexList)
     {
@@ -26,10 +26,10 @@ public class ChordalityTest {
         LexicographicBFS lexicographicBFS = new LexicographicBFS(graph);
         this.orderedVertexList = orderedVertexList;
 
-        rightNeighbours = new ArrayList<>(graph.numVertices());
+        rightNeighbours = new HashMap<>();
         parent = new HashMap<>();
-        rightNeighboursWithoutParent = new ArrayList<>(graph.numVertices());
-        children = new ArrayList<>();
+        rightNeighboursWithoutParent = new HashMap<>();
+        children = new HashMap<>();
 
         initializeContainers();
     }
@@ -42,65 +42,61 @@ public class ChordalityTest {
            int vertex = orderedVertexList[i];
            int currentParent = parent.get(vertex);
 
-           for(int j = 0; j < rightNeighboursWithoutParent.get(vertex).size(); j++)
+           // Now check if rightNeighbourNoParent list is a sublist of rightNeighbour
+           for(var rightNeighbourNoParentElement : rightNeighboursWithoutParent.get(vertex))
            {
-
-               // Now check if rightNeighbourNoParent list is a sublist of rightNeighbour
-               for(var rightNeighbourNoParentElement : rightNeighboursWithoutParent.get(vertex))
-               {
-                    boolean existsElement = false;
-                    for(var rightNeighbourElement : rightNeighbours.get(currentParent))
-                    {
-                        if(Objects.equals(rightNeighbourElement, rightNeighbourNoParentElement))
-                        {
-                            existsElement = true;
-                            break;
-                        }
-                    }
-                   // If the element cannot be found, it means it is not a sublist, return false
-                    if(!existsElement)
-                        return false;
-
-               }
+               // If the element cannot be found in the set, it means it is not a sublist, return false
+               if(!rightNeighbours.get(currentParent).contains(rightNeighbourNoParentElement))
+                   return false;
            }
+
         }
 
         return true;
      }
     private void initializeContainers()
     {
-        for(int i=0;i<orderedVertexList.length;i++)
+        for(var vertex : orderedVertexList)
         {
-            rightNeighbours.add(new ArrayList<>());
-            rightNeighboursWithoutParent.add(new ArrayList<>());
-            children.add(new ArrayList<>());
+            rightNeighbours.put(vertex, new HashSet<>());
+            rightNeighboursWithoutParent.put(vertex, new HashSet<>());
+            children.put(vertex, new HashSet<>());
         }
         // Iterate to orderVertexList.length - 1, because the last element doesn't have a parent (it is the start point of the LexBFS algorithm)
         for(int i=0;i<orderedVertexList.length - 1;i++)
         {
             int vertex = orderedVertexList[i];
+            int parentVertex = Integer.MIN_VALUE; // Used to know which vertex was first chosen to set as a parent
             for(int j=i+1;j<orderedVertexList.length;j++)
             {
                 int jVertex = orderedVertexList[j];
                 if(graph.containsEdge(vertex, jVertex))
                 {
+                    // Set the first jVertex that has an edge with the vertex as a parent of the current vertex
+                    if(parentVertex == Integer.MIN_VALUE)
+                        parentVertex = jVertex;
+
                     // If an edge exists, we already know that jVertex is on the right side of vertex, so add it to the rightNeighbours
                     rightNeighbours.get(vertex).add(jVertex);
                 }
             }
             // Add the parent and children
-            parent.put(vertex,rightNeighbours.get(vertex).get(0));
-            children.get(rightNeighbours.get(vertex).get(0)).add(vertex);
+            parent.put(vertex,parentVertex);
+            children.get(parentVertex).add(vertex);
 
-            for(int k=1;k<rightNeighbours.get(vertex).size();k++)
+            for(var neighbour : rightNeighbours.get(vertex))
             {
+                // If the neighbour is parent, skip this iteration
+                if(neighbour == parentVertex)
+                    continue;
+
                 // Populate the list without the parent
-                rightNeighboursWithoutParent.get(vertex).add(rightNeighbours.get(vertex).get(k));
+                rightNeighboursWithoutParent.get(vertex).add(neighbour);
             }
         }
     }
 
-    public List<List<Integer>> getRightNeighbours() {
+    public Map<Integer, Set<Integer>> getRightNeighbours() {
         return rightNeighbours;
     }
 
@@ -108,11 +104,8 @@ public class ChordalityTest {
         return parent;
     }
 
-    public List<List<Integer>> getRightNeighboursWithoutParent() {
-        return rightNeighboursWithoutParent;
-    }
 
-    public List<List<Integer>> getChildren() {
+    public Map<Integer, Set<Integer>> getChildren() {
         return children;
     }
 }

@@ -6,7 +6,7 @@ import java.util.*;
 
 //Lex-BFS ordering
 public class LexicographicBFS {
-    Graph<Integer, Integer> graph;
+    private final Graph graph;
 
     public LexicographicBFS(Graph graph)
     {

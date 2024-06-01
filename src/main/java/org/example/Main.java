@@ -14,6 +14,7 @@ public class Main {
         main.test1();
         main.test2();
         main.test3();
+        main.test4();
     }
 
     public void test1()
@@ -39,8 +40,8 @@ public class Main {
 
         graph.addEdge(6, 7);
 
-        IntervalGraphRecognition intervalGraphRecognition = new IntervalGraphRecognition(graph);
 
+        IntervalGraphRecognition intervalGraphRecognition = new IntervalGraphRecognition(graph);
         System.out.println("Test 1: " + intervalGraphRecognition.check());
     }
     private void test2()
@@ -82,5 +83,19 @@ public class Main {
         IntervalGraphRecognition intervalGraphRecognition = new IntervalGraphRecognition(graph);
 
         System.out.println("Test 3: " + intervalGraphRecognition.check());
+    }
+    private void test4()
+    {
+        // Test 4: The graph is interval. It has a chorales and it doesn't have AT graphs
+        Graph graph = GraphBuilder.empty().buildGraph();
+        graph.addVertices(0,1,2,3);
+        graph.addEdge(0,1);
+        graph.addEdge(1,2);
+        graph.addEdge(2,3);
+
+
+        IntervalGraphRecognition intervalGraphRecognition = new IntervalGraphRecognition(graph);
+
+        System.out.println("Test 4: " + intervalGraphRecognition.check());
     }
 }

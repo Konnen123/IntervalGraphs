@@ -39,21 +39,21 @@ public class IntervalGraphRecognition {
             return false;
         }
 
-        List<List<Integer>> rightNeighbours = chordalityTest.getRightNeighbours();
+        Map<Integer, Set<Integer>> rightNeighbours = chordalityTest.getRightNeighbours();
         Map<Integer, Integer> parent = chordalityTest.getParent();
-        List<List<Integer>> children = chordalityTest.getChildren();
+        Map<Integer, Set<Integer>> children = chordalityTest.getChildren();
 
         GenerateMaximalCliques generateMaximalCliques = new GenerateMaximalCliques(graph, orderedList, rightNeighbours, children, parent);
         generateMaximalCliques.generate();
 
-        Map<Integer, List<Integer>> cliques = generateMaximalCliques.getClique();
+        Map<Integer, Set<Integer>> cliques = generateMaximalCliques.getClique();
         List<Integer> orderedCliques = generateMaximalCliques.getOrderedCliques();
         Set<Integer> pivots = generateMaximalCliques.getPivots();
 
         return checkConsecutiveCliques(cliques, orderedCliques, pivots);
 
     }
-    private boolean checkConsecutiveCliques(Map<Integer, List<Integer>> cliques, List<Integer> orderedCliques, Set<Integer> pivots)
+    private boolean checkConsecutiveCliques(Map<Integer, Set<Integer>> cliques, List<Integer> orderedCliques, Set<Integer> pivots)
     {
         for(var currentPivot : pivots)
         {

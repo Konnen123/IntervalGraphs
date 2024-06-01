@@ -7,17 +7,17 @@ import java.util.*;
 public class GenerateMaximalCliques {
     private final Graph graph;
     private int[] orderedVertexList;
-    private List<List<Integer>> rightNeighbours;
-    private List<List<Integer>> children;
+    private Map<Integer, Set<Integer>> rightNeighbours;
+    private Map<Integer, Set<Integer>> children;
     private Map<Integer, Integer> parent;
 
     private Set<Integer> pivots = new HashSet<>();
     private List<Integer> orderedCliques = new LinkedList<>();
-    private Map<Integer, List<Integer>> clique = new HashMap<>();
+    private Map<Integer, Set<Integer>> clique = new HashMap<>();
 
 
 
-    public GenerateMaximalCliques(Graph graph, int[] orderedVertexList, List<List<Integer>> rightNeighbours, List<List<Integer>> children, Map<Integer, Integer> parent)
+    public GenerateMaximalCliques(Graph graph, int[] orderedVertexList, Map<Integer, Set<Integer>> rightNeighbours, Map<Integer, Set<Integer>> children, Map<Integer, Integer> parent)
     {
         this.graph = graph;
         this.orderedVertexList = orderedVertexList;
@@ -27,19 +27,19 @@ public class GenerateMaximalCliques {
     }
     public void generate()
     {
-        List<Integer> childrenRoot = children.get(orderedVertexList[orderedVertexList.length - 1]);
-        List<Integer> cliques = new ArrayList<>();
-        clique.put(orderedVertexList[orderedVertexList.length - 1], new LinkedList<>());
+        Set<Integer> childrenRoot = children.get(orderedVertexList[orderedVertexList.length - 1]);
+        Set<Integer> cliques = new HashSet<>();
+        clique.put(orderedVertexList[orderedVertexList.length - 1], new HashSet<>());
         clique.get(orderedVertexList[orderedVertexList.length - 1]).add(orderedVertexList[orderedVertexList.length - 1]);
         generateCliques(childrenRoot, clique, cliques);
 
-        for(int i=0;i<cliques.size();i++)
+        for(var currentClique : cliques)
         {
-            pivots.addAll(clique.get(cliques.get(i)));
+            pivots.addAll(clique.get(currentClique));
         }
 
         Stack<List<Integer>> partitions = new Stack<>();
-        partitions.add(cliques);
+        partitions.add(new LinkedList<>(cliques));
 
         while (!partitions.isEmpty())
         {
@@ -49,7 +49,7 @@ public class GenerateMaximalCliques {
             List<Integer> lastPartition = partitions.pop();
 
             orderedCliques.add(0, lastPartition.remove(0));
-            List<Integer> pivotClique = clique.get(orderedCliques.get(0));
+            List<Integer> pivotClique = new ArrayList<>(clique.get(orderedCliques.get(0)));
 
             for(var currentPartition : lastPartition)
             {
@@ -64,20 +64,20 @@ public class GenerateMaximalCliques {
             }
             if(!outPartition.isEmpty())
             {
-                partitions.add(new ArrayList<>(outPartition));
+                partitions.add(new LinkedList<>(outPartition));
             }
             if(!inPartition.isEmpty())
             {
-                partitions.add(new ArrayList<>(inPartition));
+                partitions.add(new LinkedList<>(inPartition));
             }
         }
     }
 
-    private void generateCliques(List<Integer> childrenNodes, Map<Integer, List<Integer>> clique, List<Integer> cliques)
+    private void generateCliques(Set<Integer> childrenNodes, Map<Integer, Set<Integer>> clique, Set<Integer> cliques)
     {
         for(int vertex : childrenNodes)
         {
-            clique.put(vertex, new LinkedList<>());
+            clique.put(vertex, new HashSet<>());
             for(var neighbour : rightNeighbours.get(vertex))
             {
                 clique.get(vertex).add(neighbour); // Add elements from rightNeighbours to clique
@@ -89,24 +89,15 @@ public class GenerateMaximalCliques {
             boolean isSubset = true;
             for(var parentClique : clique.get(currentParent))
             {
-                boolean existsElement = false;
-                for(var vertexClique : clique.get(vertex))
-                {
-                    if(Objects.equals(vertexClique, parentClique))
-                    {
-                        existsElement = true;
-                        break;
-                    }
-                }
-                if(!existsElement)
+                if(!clique.get(vertex).contains(parentClique))
                 {
                     isSubset = false;
                     break;
                 }
             }
-            if(isSubset && cliques.contains(currentParent))
+            if(isSubset)
             {
-                cliques.remove((Object)currentParent);
+                cliques.remove(currentParent);
             }
             cliques.add(vertex);
             if(!children.get(vertex).isEmpty())
@@ -124,20 +115,8 @@ public class GenerateMaximalCliques {
         return orderedCliques;
     }
 
-    public Map<Integer, List<Integer>> getClique() {
+    public Map<Integer, Set<Integer>> getClique() {
         return clique;
     }
 
-    private int intersectionLength(List<Integer> l1, List<Integer> l2)
-    {
-        int count = 0;
-        for(var elementL1 : l1)
-        {
-            if(l2.contains(elementL1))
-            {
-                count++;
-            }
-        }
-        return count;
-    }
 }
