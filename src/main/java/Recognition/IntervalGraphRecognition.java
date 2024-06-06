@@ -47,6 +47,7 @@ public class IntervalGraphRecognition {
         generateMaximalCliques.generate();
 
         Map<Integer, Set<Integer>> cliques = generateMaximalCliques.getClique();
+
         List<Integer> orderedCliques = generateMaximalCliques.getOrderedCliques();
         Set<Integer> pivots = generateMaximalCliques.getPivots();
 

@@ -1,5 +1,6 @@
 package org.example;
 
+import Generation.IntervalGraphBuilder;
 import Recognition.IntervalGraphRecognition;
 import Utils.ChordalityTest;
 import Utils.LexicographicBFS;
