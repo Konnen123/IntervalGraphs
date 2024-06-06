@@ -1,6 +1,7 @@
 package org.example;
 
 import Generation.IntervalGraphBuilder;
+import MaxClique.IntervalGraphMaximalClique;
 import Recognition.IntervalGraphRecognition;
 import Utils.ChordalityTest;
 import Utils.LexicographicBFS;
@@ -11,6 +12,7 @@ public class Main {
     public static void main(String[] args) {
 
         Main main = new Main();
+
 
         main.test1();
         main.test2();

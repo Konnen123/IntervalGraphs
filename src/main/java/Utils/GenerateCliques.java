@@ -4,7 +4,7 @@ import org.graph4j.Graph;
 
 import java.util.*;
 
-public class GenerateMaximalCliques {
+public class GenerateCliques {
     private final Graph graph;
     private int[] orderedVertexList;
     private Map<Integer, Set<Integer>> rightNeighbours;
@@ -17,7 +17,7 @@ public class GenerateMaximalCliques {
 
 
 
-    public GenerateMaximalCliques(Graph graph, int[] orderedVertexList, Map<Integer, Set<Integer>> rightNeighbours, Map<Integer, Set<Integer>> children, Map<Integer, Integer> parent)
+    public GenerateCliques(Graph graph, int[] orderedVertexList, Map<Integer, Set<Integer>> rightNeighbours, Map<Integer, Set<Integer>> children, Map<Integer, Integer> parent)
     {
         this.graph = graph;
         this.orderedVertexList = orderedVertexList;

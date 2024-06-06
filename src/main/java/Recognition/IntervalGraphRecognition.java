@@ -1,11 +1,10 @@
 package Recognition;
 
 import Utils.ChordalityTest;
-import Utils.GenerateMaximalCliques;
+import Utils.GenerateCliques;
 import Utils.LexicographicBFS;
 import org.graph4j.Graph;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -43,13 +42,13 @@ public class IntervalGraphRecognition {
         Map<Integer, Integer> parent = chordalityTest.getParent();
         Map<Integer, Set<Integer>> children = chordalityTest.getChildren();
 
-        GenerateMaximalCliques generateMaximalCliques = new GenerateMaximalCliques(graph, orderedList, rightNeighbours, children, parent);
-        generateMaximalCliques.generate();
+        GenerateCliques generateCliques = new GenerateCliques(graph, orderedList, rightNeighbours, children, parent);
+        generateCliques.generate();
 
-        Map<Integer, Set<Integer>> cliques = generateMaximalCliques.getClique();
+        Map<Integer, Set<Integer>> cliques = generateCliques.getClique();
 
-        List<Integer> orderedCliques = generateMaximalCliques.getOrderedCliques();
-        Set<Integer> pivots = generateMaximalCliques.getPivots();
+        List<Integer> orderedCliques = generateCliques.getOrderedCliques();
+        Set<Integer> pivots = generateCliques.getPivots();
 
         return checkConsecutiveCliques(cliques, orderedCliques, pivots);
 
