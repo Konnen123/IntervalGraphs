@@ -1,19 +1,12 @@
-package org.example;
-
-import Generation.IntervalGraphBuilder;
-import MaxClique.IntervalGraphMaximalClique;
 import Recognition.IntervalGraphRecognition;
-import Utils.ChordalityTest;
-import Utils.LexicographicBFS;
 import org.graph4j.Graph;
 import org.graph4j.GraphBuilder;
+import org.junit.Test;
 
-public class Main {
-    public static void main(String[] args) {
-
-    }
-
-    public void test1()
+public class IntervalGraphRecognitionTest
+{
+    @Test
+    public void recognition1()
     {
         // Test 1: Does not work! The graph is not AT-free (vertices 1,3,0 form an asteroid graph)
         Graph graph = GraphBuilder.empty().buildGraph();
@@ -40,7 +33,8 @@ public class Main {
         IntervalGraphRecognition intervalGraphRecognition = new IntervalGraphRecognition(graph);
         System.out.println("Test 1: " + intervalGraphRecognition.check());
     }
-    private void test2()
+    @Test
+    public void recognition2()
     {
         // Test 2: The graph is interval. It has a chord (edge 0-2) and it is AT-free
         Graph graph = GraphBuilder.empty().buildGraph();
@@ -55,8 +49,8 @@ public class Main {
 
         System.out.println("Test 2: " + intervalGraphRecognition.check());
     }
-
-    private void test3()
+    @Test
+    public void recognition3()
     {
         // Test 3: The graph is interval. It has a chorales and it doesn't have AT graphs
         Graph graph = GraphBuilder.empty().buildGraph();
@@ -80,7 +74,8 @@ public class Main {
 
         System.out.println("Test 3: " + intervalGraphRecognition.check());
     }
-    private void test4()
+    @Test
+    public void recognition4()
     {
         // Test 4: The graph is interval. It has a chorales and it doesn't have AT graphs
         Graph graph = GraphBuilder.empty().buildGraph();
